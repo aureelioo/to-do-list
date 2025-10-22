@@ -96,6 +96,35 @@ def eliminar_tarea(lista):
         print(f"Ocurrió un error inesperado: {e}")
 
 
+#Funcion para maracar tarea como completa
+def completar_tarea(lista_objetos):
+    """Pide un número de tarea y llama al método para marcarla como completada."""
+
+    mostrar_tareas(lista_objetos)
+
+    try:
+        num_tarea_str = input("Introduce el NÚMERO de la tarea a marcar como completada: ")
+        num_tarea = int(num_tarea_str)
+        indice_a_completar = num_tarea - 1  #el indice real de python
+
+        #validacion similar a la de eliminar
+        if 0 <= indice_a_completar < len(lista_objetos):
+
+            #obtenemos el objeto tarea
+            tarea_a_modificar = lista_objetos[indice_a_completar]
+
+            #llamamos al método para marcar como completa
+            tarea_a_modificar.marcar_como_completa()
+
+        else:
+            print("Error: El número de tarea no es válido.")
+    
+    except ValueError:
+        print("Error: Por favor, introduce un número válido.")
+    except Exception as e:
+        print(f"Ocurrió un error inesperado: {e}")
+
+
 #bandera de control para el bucle
 ejecutando = True
 
@@ -105,7 +134,7 @@ while ejecutando:
     #todo el codigo "dentro" del bucle con una sangria
 
     #input del usuario para escoger una opción
-    opcion = input("Elige una opción (Añadir/Ver/Salir/Eliminar): ").lower()
+    opcion = input("Elige una opción (Añadir/Ver/Salir/Eliminar/Completar): ").lower()
 
     if opcion == "añadir":
         print("¡Perfecto! Vamos a agregar una nueva tarea.")
@@ -126,6 +155,11 @@ while ejecutando:
         print("Saliendo del programa PyTareas. ¡Adiós!")
         # codigo para detener el bucle
         ejecutando = False
+
+    elif opcion == "completar":
+        print("Vamos a marcar una tarea como completada.")
+        #llamar a la funcion de completar
+        completar_tarea(tareas_objetos)
 
     else:
         # Esta es la opción de "último recurso" si el usuario escribe algo inválido
