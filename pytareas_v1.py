@@ -20,9 +20,54 @@ class Tarea:
         self.completada = True
         print(f"¡Tarea '{self.nombre}' marcada como completada! ✅")
 
+# Función guardar las tareas para despues cargarlas
+def guardar_tareas(lista_objetos, nombre_archivo="tareas.csv"):
+    """Guarda la lista de objetos Tarea en un archivo CSV,"""
+    try:
+        #Abrimos el archivo en modo "w" (escritura)
+        with open(nombre_archivo, "w") as archivo:
+            for tarea in lista_objetos:
+                #Obtenemos el nombre y el estado (convertimos el booleano a cadena)
+                linea = f"{tarea.nombre},{tarea.completada}\n"
+
+                #escribimos la linea en el archivo
+                archivo.write(linea)
+        print(f"\n💾 {len(lista_objetos)} tareas guardadas en '{nombre_archivo}'")
+    except Exception as e:
+        print(f"Error al guardar el archivo: {e}")
+    
+# Función para cargar las tareas desde un archivo
+def cargar_tareas(nombre_archivo="tareas.csv"):
+    """Carga tareas desde un archivo CSV y devuelve una lista de objetos Trea."""
+    lista_cargada = []
+    try:
+        #Abrimos el archivo en modo "r" (lectura)
+        with open(nombre_archivo, "r") as archivo:
+            for linea in archivo:
+                #Limpiamos la linea (quitamos  el "\n" y espacios)
+                linea_limpia = linea.strip()
+                #Separamos el nombre y el estado por la coma
+                nombre, estado_str = linea_limpia.split(',')
+                #Convertimos el estado string a booleano
+                estado_completado = (estado_str == "True") #Sera True si el string es "True", False en otro caso
+                #Creamos el nuevo objeto tarea
+                nueva_tarea = Tarea(nombre)
+                nueva_tarea.completada = estado_completado
+                #Añadimos el objeto a la lista
+                lista_cargada.append(nueva_tarea)
+            return lista_cargada
+                
+        print(f"\n📥 {len(lista_cargada)} tareas cargadas desde '{nombre_archivo}' al iniciar.")
+    except FileNotFoundError:
+        #Esto es normal la primera vez que se ejecuta el programa
+        print(f"Archivo {nombre_archivo}no encontrado. Iniciando con lista vacía.")
+        return []
+    except Exception as e:
+        print(f"Error al cargar el archivo: {e}")
+        return []
 
 #lista para guardar objetos tarea
-tareas_objetos = []
+tareas_objetos = cargar_tareas()
 
 
 #funciones para ver 
@@ -60,10 +105,10 @@ def agregar_tarea(lista_objetos):
 
 
 #funcion para eliminar tarea
-def eliminar_tarea(lista):
+def eliminar_tarea(lista_objetos):
     """Pide al usuario un número y elimina la tarea correspondiente."""
     #primero se muestra la lista de tareas
-    mostrar_tareas(lista)
+    mostrar_tareas(lista_objetos)
 
     try:
         #pedimos el número (el indice para el usuario
@@ -76,13 +121,14 @@ def eliminar_tarea(lista):
         indice_a_eliminar = num_tarea - 1
 
         #comprobamos que el indice este dentro de los limites de la lista
-        if 0 <= indice_a_eliminar < len(lista):
-            #guardamos el nombre de la tarea antes de eliminarla
-            tarea_eliminada = lista[indice_a_eliminar]
+        if 0 <= indice_a_eliminar < len(lista_objetos):
+            #guardamos el objeto, pero accedemos a su .nombre para la confirmacion
+            tarea_a_confirmar = lista_objetos[indice_a_eliminar]
+            nombre_eliminado = tarea_a_confirmar.nombre
 
             #usamos "del" para eliminar la tarea
-            del lista[indice_a_eliminar]
-            print(f"Tarea ELIMINADA: '{tarea_eliminada}'")
+            del lista_objetos[indice_a_eliminar]
+            print(f"Tarea ELIMINADA: '{nombre_eliminado}'")
 
         else:
             print("Error: El número de tarea no es válido.")
@@ -165,4 +211,6 @@ while ejecutando:
         # Esta es la opción de "último recurso" si el usuario escribe algo inválido
         print(f"La opción '{opcion}' no es válida. Por favor, elige Añadir, Ver o Salir.")
 
+#Guardar las tareas al salir
+guardar_tareas(tareas_objetos)
 print("Programa finalizado")
